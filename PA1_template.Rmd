@@ -9,8 +9,7 @@ date: "Wednesday, May 13, 2015"
 
 ---
 ```{r}
-library(ggplot2)
-library(data.table)
+
 echo = TRUE 
 ```
 
@@ -25,6 +24,7 @@ data <- read.csv("activity.csv", header = T, colClasses = c("integer", "Date", "
 2. Process/transform the data
 
 ```{r}
+library(data.table)
 dataTable = data.table(data)
 dataTableByDay = dataTable[, list(steps = sum(steps, na.rm = T)), 
                           by = date]
@@ -119,11 +119,32 @@ median(dataTable2ByDay$steps)
 
 ### Are there differences in activity patterns between weekdays and weekends?
 
-For this part the `weekdays()` function may be of some help here. Use
-the dataset with the filled-in missing values for this part.
-
 1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
-1. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using **simulated data**:
+```{r}
+fDayType = function(x){
+        if(weekdays(x,abbreviate=T) %in% c('Sat', 'Sun')){
+                return('Weekend')
+        }
+        return('Weekday')
+}
 
+dataTable2$dayType = as.factor(mapply(fDayType,dataTable2$date))
+dataTable2DayType = dataTable2[, list(steps = mean(steps, na.rm = T)), 
+                          by = list(interval, dayType)]
+   
+```
+
+
+
+
+2. Make a panel plot containing a time series plot (i.e. `type = "l"`) of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). The plot should look something like the following, which was created using **simulated data**:
+
+```{r}
+
+library(lattice)
+xyplot(dataTable2DayType$steps ~ dataTable2DayType$interval | dataTable2DayType$dayType, 
+       layout = c(1, 2), type = "l", 
+       xlab = "Interval", ylab = "Number of steps")
+```
 
