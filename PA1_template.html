@@ -54,11 +54,11 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <div id="header">
 <h1 class="title">Reproducible Research: Peer Assessment 1</h1>
 <h4 class="author"><em>Kevin DeCatur</em></h4>
-<h4 class="date"><em>Wednesday, May 13, 2015</em></h4>
 </div>
 
 
-<pre class="r"><code>echo = TRUE </code></pre>
+<pre class="r"><code>echo = TRUE 
+options(scipen = 1)</code></pre>
 <div id="loading-and-preprocessing-the-data" class="section level3">
 <h3>Loading and preprocessing the data</h3>
 <ol style="list-style-type: decimal">
@@ -71,7 +71,7 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 <pre class="r"><code>library(data.table)
 dataTable = data.table(data)
 dataTableByDay = dataTable[, list(steps = sum(steps, na.rm = T)), 
-                          by = date]</code></pre>
+                 by = date]</code></pre>
 </div>
 <div id="what-is-mean-total-number-of-steps-taken-per-day" class="section level3">
 <h3>What is mean total number of steps taken per day?</h3>
@@ -86,10 +86,9 @@ dataTableByDay = dataTable[, list(steps = sum(steps, na.rm = T)),
 <ol start="2" style="list-style-type: decimal">
 <li>Calculate and report the <strong>mean</strong> and <strong>median</strong> total number of steps taken per day</li>
 </ol>
-<pre class="r"><code>mean(dataTableByDay$steps)</code></pre>
-<pre><code>## [1] 9354.23</code></pre>
-<pre class="r"><code>median(dataTableByDay$steps)</code></pre>
-<pre><code>## [1] 10395</code></pre>
+<pre class="r"><code>meanSteps = mean(dataTableByDay$steps)
+medianSteps = median(dataTableByDay$steps)</code></pre>
+<p>The mean number of steps is 9354.2295082.<br />The median number of steps is 10395.</p>
 </div>
 <div id="what-is-the-average-daily-activity-pattern" class="section level3">
 <h3>What is the average daily activity pattern?</h3>
@@ -107,21 +106,23 @@ plot(dataTableMeanByInterval$interval, dataTableMeanByInterval$avgSteps, type = 
 <ol start="2" style="list-style-type: decimal">
 <li>Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?</li>
 </ol>
-<pre class="r"><code>maxSteps = dataTableMeanByInterval[which.max(avgSteps), interval]
-maxSteps</code></pre>
-<pre><code>## [1] 835
-## 288 Levels: 0 10 100 1000 1005 1010 1015 1020 1025 1030 1035 1040 ... 955</code></pre>
+<pre class="r"><code>maxInterval = dataTableMeanByInterval[which.max(avgSteps), interval]
+maxSteps = dataTableMeanByInterval[which.max(avgSteps), avgSteps]</code></pre>
+<p>The max number of steps per interval accross all days is 206.1698113 at interval # 835.</p>
 </div>
 <div id="imputing-missing-values" class="section level3">
 <h3>Imputing missing values</h3>
 <ol style="list-style-type: decimal">
 <li>Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with <code>NA</code>s)</li>
 </ol>
-<pre class="r"><code>sum(is.na(dataTable$steps))</code></pre>
-<pre><code>## [1] 2304</code></pre>
+<pre class="r"><code>sumNA = sum(is.na(dataTable$steps))</code></pre>
+<p>The total number of missing values is 2304.</p>
 <ol start="2" style="list-style-type: decimal">
-<li><p>Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.</p></li>
-<li><p>Create a new dataset that is equal to the original dataset but with the missing data filled in.</p></li>
+<li>Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.</li>
+</ol>
+<p>For each value of ’steps’that has no value, the value will be set to the mean number of steps of all other observations with the same interval #.</p>
+<ol start="3" style="list-style-type: decimal">
+<li>Create a new dataset that is equal to the original dataset but with the missing data filled in.</li>
 </ol>
 <pre class="r"><code>dataTable2 &lt;- dataTable 
 for (i in 1:nrow(dataTable2)) {
@@ -141,10 +142,10 @@ dataTable2ByDay = dataTable2[, list(steps = sum(steps)),
      main = &quot;Histogram of the Total Number of Steps&quot;,
      xlab = 'Total Number of Steps', col = 'blue')</code></pre>
 <p><img src="data:image/png;base64,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" /></p>
-<pre class="r"><code>mean(dataTable2ByDay$steps)</code></pre>
-<pre><code>## [1] 10765.64</code></pre>
-<pre class="r"><code>median(dataTable2ByDay$steps)</code></pre>
-<pre><code>## [1] 10762</code></pre>
+<pre class="r"><code>meanSteps2 = mean(dataTable2ByDay$steps)
+medianSteps2 = median(dataTable2ByDay$steps)</code></pre>
+<p>After filling missing data, the mean number of steps changed from 9354.2295082 to 10765.6393443.</p>
+<p>The median number of steps changed from 10395 to 10762.</p>
 </div>
 <div id="are-there-differences-in-activity-patterns-between-weekdays-and-weekends" class="section level3">
 <h3>Are there differences in activity patterns between weekdays and weekends?</h3>

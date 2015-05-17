@@ -1,9 +1,9 @@
 # Reproducible Research: Peer Assessment 1
 Kevin DeCatur  
-Wednesday, May 13, 2015  
 
 ```r
 echo = TRUE 
+options(scipen = 1)
 ```
 
 ### Loading and preprocessing the data
@@ -22,7 +22,7 @@ data <- read.csv("activity.csv", header = T, colClasses = c("integer", "Date", "
 library(data.table)
 dataTable = data.table(data)
 dataTableByDay = dataTable[, list(steps = sum(steps, na.rm = T)), 
-                          by = date]
+                 by = date]
 ```
 
 ### What is mean total number of steps taken per day?
@@ -43,21 +43,13 @@ hist(dataTableByDay$steps,
 
 
 ```r
-mean(dataTableByDay$steps)
+meanSteps = mean(dataTableByDay$steps)
+medianSteps = median(dataTableByDay$steps)
 ```
-
-```
-## [1] 9354.23
-```
-
-```r
-median(dataTableByDay$steps)
-```
-
-```
-## [1] 10395
-```
-
+  
+  
+The mean number of steps is 9354.2295082.  
+The median number of steps is 10395.
 
 ### What is the average daily activity pattern?
 
@@ -80,29 +72,30 @@ plot(dataTableMeanByInterval$interval, dataTableMeanByInterval$avgSteps, type = 
 
 
 ```r
-maxSteps = dataTableMeanByInterval[which.max(avgSteps), interval]
-maxSteps
+maxInterval = dataTableMeanByInterval[which.max(avgSteps), interval]
+maxSteps = dataTableMeanByInterval[which.max(avgSteps), avgSteps]
 ```
-
-```
-## [1] 835
-## 288 Levels: 0 10 100 1000 1005 1010 1015 1020 1025 1030 1035 1040 ... 955
-```
-
+  
+  
+The max number of steps per interval accross all days is 206.1698113 at interval # 835.    
+ 
+   
 ### Imputing missing values
 
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with `NA`s)
 
 
 ```r
-sum(is.na(dataTable$steps))
+sumNA = sum(is.na(dataTable$steps))
 ```
 
-```
-## [1] 2304
-```
-
+The total number of missing values is 2304.  
+  
+  
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+For each value of 'steps'that has no value, the value will be set to the mean number of steps of all other observations with the same interval #.
+
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
@@ -136,21 +129,16 @@ hist(dataTable2ByDay$steps,
 
 
 ```r
-mean(dataTable2ByDay$steps)
+meanSteps2 = mean(dataTable2ByDay$steps)
+medianSteps2 = median(dataTable2ByDay$steps)
 ```
+  
+After filling missing data, the mean number of steps changed from 9354.2295082 to  10765.6393443.      
 
-```
-## [1] 10765.64
-```
-
-```r
-median(dataTable2ByDay$steps)
-```
-
-```
-## [1] 10762
-```
-
+The median number of steps changed from 10395 to 10762.  
+  
+  
+      
 ### Are there differences in activity patterns between weekdays and weekends?
 
 1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.

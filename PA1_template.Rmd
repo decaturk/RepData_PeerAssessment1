@@ -5,12 +5,12 @@ output:
     keep_md: true
 
 author: "Kevin DeCatur"
-date: "Wednesday, May 13, 2015"
+
 
 ---
 ```{r}
-
 echo = TRUE 
+options(scipen = 1)
 ```
 
 ### Loading and preprocessing the data
@@ -27,7 +27,7 @@ data <- read.csv("activity.csv", header = T, colClasses = c("integer", "Date", "
 library(data.table)
 dataTable = data.table(data)
 dataTableByDay = dataTable[, list(steps = sum(steps, na.rm = T)), 
-                          by = date]
+                 by = date]
 ```
 
 ### What is mean total number of steps taken per day?
@@ -45,11 +45,14 @@ hist(dataTableByDay$steps,
 
 2. Calculate and report the **mean** and **median** total number of steps taken per day
 
-```{r}
-mean(dataTableByDay$steps)
-median(dataTableByDay$steps)
+```{r }
+meanSteps = mean(dataTableByDay$steps)
+medianSteps = median(dataTableByDay$steps)
 ```
-
+  
+  
+The mean number of steps is `r meanSteps`.  
+The median number of steps is `r medianSteps`.
 
 ### What is the average daily activity pattern?
 
@@ -70,19 +73,29 @@ plot(dataTableMeanByInterval$interval, dataTableMeanByInterval$avgSteps, type = 
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
 ```{r}
-maxSteps = dataTableMeanByInterval[which.max(avgSteps), interval]
-maxSteps
+maxInterval = dataTableMeanByInterval[which.max(avgSteps), interval]
+maxSteps = dataTableMeanByInterval[which.max(avgSteps), avgSteps]
 ````
-
+  
+  
+The max number of steps per interval accross all days is `r maxSteps` at interval # `r maxInterval`.    
+ 
+   
 ### Imputing missing values
 
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with `NA`s)
 
 ```{r}
-sum(is.na(dataTable$steps))
+sumNA = sum(is.na(dataTable$steps))
 ```
 
+The total number of missing values is `r sumNA`.  
+  
+  
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
+
+For each value of 'steps'that has no value, the value will be set to the mean number of steps of all other observations with the same interval #.
+
 
 3. Create a new dataset that is equal to the original dataset but with the missing data filled in.
 
@@ -113,10 +126,16 @@ hist(dataTable2ByDay$steps,
 
 
 ```{r}
-mean(dataTable2ByDay$steps)
-median(dataTable2ByDay$steps)
+meanSteps2 = mean(dataTable2ByDay$steps)
+medianSteps2 = median(dataTable2ByDay$steps)
 ```
+  
+After filling missing data, the mean number of steps changed from `r meanSteps` to  `r meanSteps2`.      
 
+The median number of steps changed from `r medianSteps` to `r medianSteps2`.  
+  
+  
+      
 ### Are there differences in activity patterns between weekdays and weekends?
 
 1. Create a new factor variable in the dataset with two levels -- "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
